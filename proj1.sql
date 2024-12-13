@@ -100,19 +100,35 @@ order by p.playerID desc,s.schoolID
 -- Question 3i
 CREATE VIEW q3i(playerid, namefirst, namelast, yearid, slg)
 AS
-  SELECT 1, 1, 1, 1, 1 -- replace this line
+select p.playerID,p.namefirst,p.nameLast,b.yearID, 1.0*(H-H2B-H3B-HR+H2B*2+H3B*3+HR*4) /AB as sig 
+from batting b,people p 
+where b.playerID=p.playerID and b.AB>50
+group by p.playerID,b.yearID,b.teamID
+order by sig desc,b.yearid,p.playerID 
+LIMIT 10
 ;
 
 -- Question 3ii
 CREATE VIEW q3ii(playerid, namefirst, namelast, lslg)
 AS
-  SELECT 1, 1, 1, 1 -- replace this line
+  select p.playerID,p.nameFirst,p.nameLast, 1.0*sum(H-H2B-H3B-HR+H2B*2+H3B*3+HR*4) /sum(AB) as lsig 
+  from batting b,people p 
+  where b.playerID=p.playerID 
+  group by p.playerID
+  having sum(AB) > 50
+  order by lsig desc,p.playerID 
+  limit 10
 ;
 
 -- Question 3iii
 CREATE VIEW q3iii(namefirst, namelast, lslg)
 AS
-  SELECT 1, 1, 1 -- replace this line
+  select p.nameFirst,p.nameLast, 1.0*sum(H-H2B-H3B-HR+H2B*2+H3B*3+HR*4) /sum(AB) as lsig 
+  from batting b,people p 
+  where b.playerID=p.playerID 
+  group by p.playerID
+  having sum(AB) > 50 and lsig > (select 1.0*sum(H-H2B-H3B-HR+H2B*2+H3B*3+HR*4) /sum(AB) from batting b, people p where p.playerID="mayswi01" and b.playerID="mayswi01" ) 
+  order by lsig desc,p.playerID 
 ;
 
 -- Question 4i

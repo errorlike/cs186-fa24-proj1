@@ -134,13 +134,21 @@ AS
 -- Question 4i
 CREATE VIEW q4i(yearid, min, max, avg)
 AS
-  SELECT 1, 1, 1, 1 -- replace this line
+select yearId,min(s.salary) as min,max(s.salary) as max,avg(s.salary) as avg 
+from salaries s,people p 
+where s.playerID =p.playerID  
+group by s.yearId 
+order by s.yearid
 ;
 
 -- Question 4ii
 CREATE VIEW q4ii(binid, low, high, count)
 AS
-  SELECT 1, 1, 1, 1 -- replace this line
+  with year_statis(min,max,range) as (
+  select min(s.salary) ,max(s.salary),(max(s.salary)-min(s.salary))/10 from salaries s where yearId =2016 ),
+  bin as (
+  select binid,binid*(select range from year_statis)+(select min from year_statis) as low,(binid+1)*(select range from year_statis)+(select min from year_statis) as high from binids)
+  select *,(select iif(binid = 9,count(*)+1,count(*)) from salaries where salary>=low and salary<high and yearid = 2016) as count from bin
 ;
 
 -- Question 4iii

@@ -154,16 +154,33 @@ AS
 -- Question 4iii
 CREATE VIEW q4iii(yearid, mindiff, maxdiff, avgdiff)
 AS
-  SELECT 1, 1, 1, 1 -- replace this line
+  with y(yearId,max,min,avg) as  
+  (select yearID,max(salary),min(salary),avg(salary) 
+    from salaries 
+    group by yearID 
+    )
+  select current.yearId,current.min-last.min as mindiff, current.max-last.max as maxdiff,current.avg-last.avg as avgdiff  
+  from y current 
+  join y last on current.yearId -1 = last.yearId
+  order by current.yearId
 ;
 
 -- Question 4iv
 CREATE VIEW q4iv(playerid, namefirst, namelast, salary, yearid)
 AS
-  SELECT 1, 1, 1, 1, 1 -- replace this line
+with max_statis as (select max(salary) as max, yearId from salaries s 
+where yearId = 2000 or yearId = 2001 group BY yearId) 
+select p.playerID,p.nameFirst,p.nameLast,s.salary,s.yearId 
+from salaries s 
+join max_statis m on s.salary = m.max and s.yearId=m.yearId 
+join people p on p.playerID = s.playerID 
 ;
 -- Question 4v
 CREATE VIEW q4v(team, diffAvg) AS
-  SELECT 1, 1 -- replace this line
+  with star_salary(teamID,min,max) as (select a.teamID,min(salary),max(salary) 
+  from salaries s,allstarfull a  
+  where s.yearId = 2016 and s.yearID = a.yearId and a.playerID=s.playerID and a.teamID=s.teamID 
+  group by a.teamID )
+  select teamID,max-min as diffAvg from star_salary
 ;
 
